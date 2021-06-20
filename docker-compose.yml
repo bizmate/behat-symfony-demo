@@ -1,0 +1,32 @@
+version: '2'
+services:
+  php:
+    build:
+      context: docker/php7
+    volumes:
+      - $PWD:/var/www/html
+      - ./docker/php.ini:/etc/php/7.1/cli/php.ini
+    user: $UID
+    working_dir: /var/www/html
+    depends_on:
+      - db
+
+  composer:
+    build:
+      context: docker/composer
+    user: $UID
+    depends_on:
+      - php
+    volumes:
+      - $PWD:/app
+    working_dir: /app
+    command: composer install
+
+  db:
+    image: mysql
+    restart: always
+    ports:
+      - 3307:3306
+    environment:
+        MYSQL_ROOT_PASSWORD: example
+        MYSQL_DATABASE: tests
